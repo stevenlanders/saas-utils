@@ -88,6 +88,18 @@ const updatePassword = async (username, tempPass) => {
   return newPassword;
 }
 
+module.exports.postCreateNetvoteAdminUser = async (event, context, callback) => {
+  console.log(event);
+  if(!event.request.userAttributes["custom:company"]){
+    await sp.adminUpdateUserAttributes({
+      Username: event.userName,
+      UserAttributes: [{Name: "custom:company", Value: uuid() }],
+      UserPoolId: USER_POOL_ID
+    }).promise()
+  }
+  callback(null, event);
+}
+
 module.exports.createNetvoteAdminUser = async (event, context) => {
   if(!event.username) {
     return errorResp(400, "username is required");

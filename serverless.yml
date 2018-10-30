@@ -30,7 +30,14 @@ functions:
       role: keyProvisioner
       handler: handler.createNetvoteAdminUser
       environment:
-        userPoolId: "us-east-1_svd7ExXfX"
+        userPoolId: "us-east-1_gjH1FmMsn"
+        region: "us-east-1"
+
+  postCreateNetvoteAdminUser:
+      role: keyProvisioner
+      handler: handler.postCreateNetvoteAdminUser
+      environment:
+        userPoolId: "us-east-1_gjH1FmMsn"
         region: "us-east-1"
 
 resources:
