@@ -1,0 +1,104 @@
+service: create-api-user 
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  
+
+functions:
+  createApiUser:
+    role: keyProvisioner
+    handler: handler.createApiUser
+    environment:
+      clientId: "6d5bgvo3j82eli47c36c00sreb"
+      userPoolId: "us-east-1_XGFVRW86R"
+      usagePlanId: "6c9trv"
+      userType: netvote
+      region: "us-east-1"
+
+  createNetrosaApiUser:
+      role: keyProvisioner
+      handler: handler.createApiUser
+      environment:
+        clientId: "3qo1dhj032rhdmqkj3usqkgd13"
+        userPoolId: "us-east-1_ucyYosvk8"
+        usagePlanId: "qrtaxi"
+        userType: netrosa
+        region: "us-west-1"
+
+  createNetvoteAdminUser:
+      role: keyProvisioner
+      handler: handler.createNetvoteAdminUser
+      environment:
+        userPoolId: "us-east-1_svd7ExXfX"
+        region: "us-east-1"
+
+resources:
+  Resources:
+    keyProvisioner:
+      Type: AWS::IAM::Role
+      Properties:
+        Path: /api/utils/
+        RoleName: KeyProvisioner_${self:provider.stage}
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: keyProvisionerPolicy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                  - Effect: Allow 
+                    Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                    Resource: 
+                    - 'Fn::Join':
+                      - ':'
+                      -
+                        - 'arn:aws:logs'
+                        - Ref: 'AWS::Region'
+                        - Ref: 'AWS::AccountId'
+                        - 'log-group:/aws/lambda/*:*:*'
+                  - Effect: "Allow"
+                    Action:
+                      - "s3:PutObject"
+                    Resource:
+                      Fn::Join:
+                        - ""
+                        - - "arn:aws:s3:::"
+                          - "Ref" : "ServerlessDeploymentBucket"
+                  - Effect: Allow
+                    Action:
+                      - apigateway:POST
+                    Resource: "arn:aws:apigateway:us-east-1::/apikeys"
+                  - Effect: Allow
+                    Action:
+                      - apigateway:POST
+                    Resource: "arn:aws:apigateway:us-east-1::/usageplans/*/keys"
+                  - Effect: Allow
+                    Action:
+                      - apigateway:POST
+                    Resource: "arn:aws:apigateway:us-west-1::/apikeys"
+                  - Effect: Allow
+                    Action:
+                      - apigateway:POST
+                    Resource: "arn:aws:apigateway:us-west-1::/usageplans/*/keys"
+                  - Effect: Allow
+                    Action:
+                      - cognito-identity:*
+                      - cognito-idp:*
+                      - cognito-sync:*
+                      - iam:ListRoles
+                      - iam:ListOpenIdConnectProviders
+                      - iam:ListPlatformApplications
+                    Resource: "*"
+
+
+                   
