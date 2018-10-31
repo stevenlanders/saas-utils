@@ -244,5 +244,8 @@ module.exports = {
     createKey: createKey,
     getKeyList: getKeyList,
     getKey: getKey,
-    deleteKey: deleteKey
+    deleteKey: deleteKey,
+    kmsEncrypt: kmsEncrypt,
+    insertKey: insertKey,
+    uuid: uuid
 }

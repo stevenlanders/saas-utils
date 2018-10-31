@@ -33,4 +33,3 @@ module.exports.deleteKey = async (event, context) => {
         deleted: true
     });
 };
-
