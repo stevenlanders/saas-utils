@@ -75,6 +75,11 @@ const updatePassword = async (username, tempPass) => {
     return newPassword;
 }
 
+const countKeys = async (user) => {
+    let list = await getKeyList(user);
+    return list.length;
+}
+
 
 const createApiKey = async (name) => {
     let res = await apigateway.createApiKey({ enabled: true, name: name }).promise();
@@ -243,6 +248,7 @@ const insertKey = async (obj) => {
 module.exports = {
     createKey: createKey,
     getKeyList: getKeyList,
+    countKeys: countKeys,
     getKey: getKey,
     deleteKey: deleteKey,
     kmsEncrypt: kmsEncrypt,

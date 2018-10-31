@@ -5,7 +5,12 @@ let keyUtils = require("./lib/key-utils")
 
 module.exports.createNvApiKey = async (event, context) => {
     let user = utils.getUser(event);
+    let keyCount = await keyUtils.countKeys(user);
     console.log(user);
+    if(keyCount >= 10) {
+        console.log("attempt to create 11th key...not allowing")
+        return utils.error(409, "Only 10 keys are allowed. Delete one to create another.")
+    }
     let result = await keyUtils.createKey(user)
     return utils.success(result);
 };
