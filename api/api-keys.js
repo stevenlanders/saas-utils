@@ -2,14 +2,16 @@
 
 let utils = require("./lib/utils")
 let keyUtils = require("./lib/key-utils")
+let tenants = require("./lib/tenants")
 
 module.exports.createNvApiKey = async (event, context) => {
     let user = utils.getUser(event);
     let keyCount = await keyUtils.countKeys(user);
+    let tenant = await tenants.getTenant(user.company);
     console.log(user);
-    if(keyCount >= 10) {
-        console.log("attempt to create 11th key...not allowing")
-        return utils.error(409, "Only 10 keys are allowed. Delete one to create another.")
+    if(keyCount >= tenant.maxApiKeys) {
+        console.log(`attempt to create more than ${tenant.maxApiKeys} keys...not allowing`)
+        return utils.error(403, `Maximum number of keys (${tenant.maxApiKeys}) has been reached. Delete one to create another.`)
     }
     let result = await keyUtils.createKey(user)
     return utils.success(result);

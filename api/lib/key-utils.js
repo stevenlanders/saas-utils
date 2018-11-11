@@ -202,6 +202,7 @@ const getKey = async (user, keyId) => {
         id: item.keyId,
         apiKey: item.apiKey,
         apiId: item.apiId,
+        awsKeyId: item.awsKeyId,
         apiSecret: apiSecret,
         createdAt: item.createdAt,
         createdBy: item.createdBy

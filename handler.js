@@ -3,6 +3,7 @@
 let AWS = require("aws-sdk")
 let crypto = require("crypto")
 let uuid = require("uuid/v4")
+let tenants = require("./api/lib/tenants")
 var sp = new AWS.CognitoIdentityServiceProvider({apiVersion: '2016-04-18'});
 
 const CLIENT_ID = process.env.clientId;
@@ -91,9 +92,11 @@ const updatePassword = async (username, tempPass) => {
 module.exports.postCreateNetvoteAdminUser = async (event, context, callback) => {
   console.log(event);
   if(!event.request.userAttributes["custom:company"]){
+    let emailAddress = event.request.userAttributes["email"];
+    let tenantId = await tenants.createNewTenant(emailAddress);
     await sp.adminUpdateUserAttributes({
       Username: event.userName,
-      UserAttributes: [{Name: "custom:company", Value: uuid() }],
+      UserAttributes: [{Name: "custom:company", Value: tenantId}],
       UserPoolId: USER_POOL_ID
     }).promise()
   }

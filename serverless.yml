@@ -10,6 +10,7 @@ provider:
   nvUsagePlanId: 6c9trv
 
 functions:
+
   createApiUser:
     role: keyProvisioner
     handler: handler.createApiUser
@@ -26,9 +27,9 @@ functions:
     environment:
       clientId: "3qo1dhj032rhdmqkj3usqkgd13"
       userPoolId: ${self:provider.nrApiUserPool}
-      usagePlanId: "qrtaxi"
+      usagePlanId: "wcavhy"
       userType: netrosa
-      region: "us-west-1"
+      region: "us-east-1"
 
   createNetvoteAdminUser:
     role: keyProvisioner
@@ -124,6 +125,18 @@ functions:
             name: authorizer
             arn: arn:aws:cognito-idp:us-east-1:891335278704:userpool/${self:provider.nvAdminUserPool}
 
+  getTenant:
+    role: keyProvisioner
+    handler: api/get-tenant.get
+    events:
+      - http:
+          path: tenant
+          method: get
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:us-east-1:891335278704:userpool/${self:provider.nvAdminUserPool}
+
 resources:
   Resources:
     keyProvisioner:
@@ -171,6 +184,10 @@ resources:
                     Resource: "arn:aws:apigateway:us-east-1::/apikeys"
                   - Effect: Allow
                     Action:
+                      - apigateway:DELETE
+                    Resource: "arn:aws:apigateway:us-east-1::/apikeys/*"
+                  - Effect: Allow
+                    Action:
                       - apigateway:POST
                     Resource: "arn:aws:apigateway:us-east-1::/usageplans/*/keys"
                   - Effect: Allow
@@ -202,6 +219,11 @@ resources:
                       - dynamodb:PutItem
                       - dynamodb:DeleteItem
                     Resource: "arn:aws:dynamodb:us-east-1:891335278704:table/netvoteApiKeys"
+                  - Effect: Allow
+                    Action:
+                      - dynamodb:GetItem
+                      - dynamodb:PutItem
+                    Resource: "arn:aws:dynamodb:us-east-1:891335278704:table/tenants"
 
 
 
