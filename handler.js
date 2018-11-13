@@ -47,7 +47,7 @@ const sendEmailToSupport = async (user) => {
   // Create sendEmail params
   const params = {
     Destination: {
-      ToAddresses: ["steven@netvote.io"]
+      ToAddresses: ["steven@netvote.io","support@citizendata.network"]
     },
     Message: {
       Body: {
@@ -61,7 +61,7 @@ const sendEmailToSupport = async (user) => {
         Data: `Citizen Data Signup: ${user.email}`
       }
     },
-    Source: "steven@netvote.io"
+    Source: "support@citizendata.network"
   };
   await new AWS.SES({ apiVersion: "2010-12-01" }).sendEmail(params).promise();
 }
