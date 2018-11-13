@@ -224,7 +224,10 @@ resources:
                       - dynamodb:GetItem
                       - dynamodb:PutItem
                     Resource: "arn:aws:dynamodb:us-east-1:891335278704:table/tenants"
-
+                  - Effect: Allow
+                    Action:
+                      - ses:*
+                    Resource: "*"
 
 
                    

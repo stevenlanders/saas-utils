@@ -32,6 +32,40 @@ const errorResp = (code, message) => {
   };
 }
 
+const toHtml = (obj) => {
+  let keys = Object.keys(obj);
+  let result = ""
+  for(let i=0; i<keys.length; i++){
+    let k = keys[i];
+    let v = obj[k];
+    result += `${k}: ${v}<br/>`
+  }
+  return result;
+}
+
+const sendEmailToSupport = async (user) => {
+  // Create sendEmail params
+  const params = {
+    Destination: {
+      ToAddresses: ["steven@netvote.io"]
+    },
+    Message: {
+      Body: {
+        Html: {
+          Charset: "UTF-8",
+          Data: toHtml(user)
+        }
+      },
+      Subject: {
+        Charset: "UTF-8",
+        Data: `Citizen Data Signup: ${user.email}`
+      }
+    },
+    Source: "steven@netvote.io"
+  };
+  await new AWS.SES({ apiVersion: "2010-12-01" }).sendEmail(params).promise();
+}
+
 const generatePassword = async () => {
   return new Promise((resolve, reject) => {
     crypto.randomBytes(48, function(err, buffer) {
@@ -99,6 +133,11 @@ module.exports.postCreateNetvoteAdminUser = async (event, context, callback) => 
       UserAttributes: [{Name: "custom:company", Value: tenantId}],
       UserPoolId: USER_POOL_ID
     }).promise()
+
+    // copy attributes and append tenantId
+    let attrs = JSON.parse(JSON.stringify(event.request.userAttributes));
+    attrs["custom:company"] = tenantId;
+    await sendEmailToSupport(attrs)
   }
   callback(null, event);
 }
