@@ -3,7 +3,7 @@ service: create-api-user
 provider:
   name: aws
   runtime: nodejs8.10
-  nvAdminUserPool: us-east-1_gjH1FmMsn
+  nvAdminUserPool: us-east-1_vLfOuHEEO
   nvApiUserPool: us-east-1_XGFVRW86R
   nrApiUserPool: us-east-1_ucyYosvk8
   nvClientId: 6d5bgvo3j82eli47c36c00sreb
