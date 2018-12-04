@@ -4,7 +4,7 @@ let utils = require("./lib/utils")
 let keyUtils = require("./lib/key-utils")
 let tenants = require("./lib/tenants")
 
-module.exports.createNvApiKey = async (event, context) => {
+module.exports.createKey = async (event, context) => {
     let user = utils.getUser(event);
     let keyCount = await keyUtils.countKeys(user);
     let tenant = await tenants.getTenant(user.company);

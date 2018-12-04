@@ -5,9 +5,11 @@ provider:
   runtime: nodejs8.10
   nvAdminUserPool: us-east-1_vLfOuHEEO
   nvApiUserPool: us-east-1_XGFVRW86R
-  nrApiUserPool: us-east-1_ucyYosvk8
   nvClientId: 6d5bgvo3j82eli47c36c00sreb
   nvUsagePlanId: 6c9trv
+  nrApiUserPool: us-east-1_ucyYosvk8
+  nrClientId: 3qo1dhj032rhdmqkj3usqkgd13
+  nrUsagePlanId: wcavhy
 
 functions:
 
@@ -45,9 +47,9 @@ functions:
       userPoolId: ${self:provider.nvAdminUserPool}
       region: "us-east-1"
 
-  apiCreateNvApiKey:
+  apiCreateNvApiKeyOld:
     role: keyProvisioner
-    handler: api/api-keys.createNvApiKey
+    handler: api/api-keys.createKey
     environment:
       apiKeyTable: netvoteApiKeys
       clientId: ${self:provider.nvClientId}
@@ -65,7 +67,7 @@ functions:
             name: authorizer
             arn: arn:aws:cognito-idp:us-east-1:891335278704:userpool/${self:provider.nvAdminUserPool}
 
-  apiGetNvApiKeyList:
+  apiGetNvApiKeyListOld:
     role: keyProvisioner
     handler: api/api-keys.getKeyList
     environment:
@@ -85,7 +87,7 @@ functions:
             name: authorizer
             arn: arn:aws:cognito-idp:us-east-1:891335278704:userpool/${self:provider.nvAdminUserPool}
 
-  apiGetNvApiKey:
+  apiGetNvApiKeyOld:
     role: keyProvisioner
     handler: api/api-keys.getKey
     environment:
@@ -105,7 +107,7 @@ functions:
             name: authorizer
             arn: arn:aws:cognito-idp:us-east-1:891335278704:userpool/${self:provider.nvAdminUserPool}
 
-  apiDeleteNvApiKey:
+  apiDeleteNvApiKeyOld:
     role: keyProvisioner
     handler: api/api-keys.deleteKey
     environment:
@@ -124,6 +126,167 @@ functions:
           authorizer:
             name: authorizer
             arn: arn:aws:cognito-idp:us-east-1:891335278704:userpool/${self:provider.nvAdminUserPool}
+
+  apiCreateNvApiKey:
+    role: keyProvisioner
+    handler: api/api-keys.createKey
+    environment:
+      apiKeyTable: netvoteApiKeys
+      clientId: ${self:provider.nvClientId}
+      userPoolId: ${self:provider.nvApiUserPool}
+      usagePlanId: ${self:provider.nvUsagePlanId}
+      userType: netvote
+      region: "us-east-1"
+      keyArn: 'arn:aws:kms:us-east-1:891335278704:key/74e26e5e-dee2-4eb9-8774-2a619e62d020'
+    events:
+      - http:
+          path: netvote/apikey
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:us-east-1:891335278704:userpool/${self:provider.nvAdminUserPool}
+
+  apiGetNvApiKeyList:
+    role: keyProvisioner
+    handler: api/api-keys.getKeyList
+    environment:
+      apiKeyTable: netvoteApiKeys
+      clientId: ${self:provider.nvClientId}
+      userPoolId: ${self:provider.nvApiUserPool}
+      usagePlanId: ${self:provider.nvUsagePlanId}
+      userType: netvote
+      region: "us-east-1"
+      keyArn: 'arn:aws:kms:us-east-1:891335278704:key/74e26e5e-dee2-4eb9-8774-2a619e62d020'
+    events:
+      - http:
+          path: netvote/apikey
+          method: get
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:us-east-1:891335278704:userpool/${self:provider.nvAdminUserPool}
+
+  apiGetNvApiKey:
+    role: keyProvisioner
+    handler: api/api-keys.getKey
+    environment:
+      apiKeyTable: netvoteApiKeys
+      clientId: ${self:provider.nvClientId}
+      userPoolId: ${self:provider.nvApiUserPool}
+      usagePlanId: ${self:provider.nvUsagePlanId}
+      userType: netvote
+      region: "us-east-1"
+      keyArn: 'arn:aws:kms:us-east-1:891335278704:key/74e26e5e-dee2-4eb9-8774-2a619e62d020'
+    events:
+      - http:
+          path: netvote/apikey/{id}
+          method: get
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:us-east-1:891335278704:userpool/${self:provider.nvAdminUserPool}
+
+  apiDeleteNvApiKey:
+    role: keyProvisioner
+    handler: api/api-keys.deleteKey
+    environment:
+      apiKeyTable: netvoteApiKeys
+      clientId: ${self:provider.nvClientId}
+      userPoolId: ${self:provider.nvApiUserPool}
+      usagePlanId: ${self:provider.nvUsagePlanId}
+      userType: netvote
+      region: "us-east-1"
+      keyArn: 'arn:aws:kms:us-east-1:891335278704:key/74e26e5e-dee2-4eb9-8774-2a619e62d020'
+    events:
+      - http:
+          path: netvote/apikey/{id}
+          method: delete
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:us-east-1:891335278704:userpool/${self:provider.nvAdminUserPool}
+
+  apiCreateNrApiKey:
+    role: keyProvisioner
+    handler: api/api-keys.createKey
+    environment:
+      apiKeyTable: netrosaApiKeys
+      clientId: ${self:provider.nrClientId}
+      userPoolId: ${self:provider.nrApiUserPool}
+      usagePlanId: ${self:provider.nrUsagePlanId}
+      userType: netrosa
+      region: "us-east-1"
+      keyArn: 'arn:aws:kms:us-east-1:891335278704:key/74e26e5e-dee2-4eb9-8774-2a619e62d020'
+    events:
+      - http:
+          path: netrosa/apikey
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:us-east-1:891335278704:userpool/${self:provider.nvAdminUserPool}
+
+  apiGetNrApiKeyList:
+    role: keyProvisioner
+    handler: api/api-keys.getKeyList
+    environment:
+      apiKeyTable: netrosaApiKeys
+      clientId: ${self:provider.nrClientId}
+      userPoolId: ${self:provider.nrApiUserPool}
+      usagePlanId: ${self:provider.nrUsagePlanId}
+      userType: netrosa
+      region: "us-east-1"
+      keyArn: 'arn:aws:kms:us-east-1:891335278704:key/74e26e5e-dee2-4eb9-8774-2a619e62d020'
+    events:
+      - http:
+          path: netrosa/apikey
+          method: get
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:us-east-1:891335278704:userpool/${self:provider.nvAdminUserPool}
+
+  apiGetNrApiKey:
+    role: keyProvisioner
+    handler: api/api-keys.getKey
+    environment:
+      apiKeyTable: netrosaApiKeys
+      clientId: ${self:provider.nrClientId}
+      userPoolId: ${self:provider.nrApiUserPool}
+      usagePlanId: ${self:provider.nrUsagePlanId}
+      userType: netrosa
+      region: "us-east-1"
+      keyArn: 'arn:aws:kms:us-east-1:891335278704:key/74e26e5e-dee2-4eb9-8774-2a619e62d020'
+    events:
+      - http:
+          path: netrosa/apikey/{id}
+          method: get
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:us-east-1:891335278704:userpool/${self:provider.nvAdminUserPool}
+
+  apiDeleteNrApiKey:
+    role: keyProvisioner
+    handler: api/api-keys.deleteKey
+    environment:
+      apiKeyTable: netrosaApiKeys
+      clientId: ${self:provider.nrClientId}
+      userPoolId: ${self:provider.nrApiUserPool}
+      usagePlanId: ${self:provider.nrUsagePlanId}
+      userType: netrosa
+      region: "us-east-1"
+      keyArn: 'arn:aws:kms:us-east-1:891335278704:key/74e26e5e-dee2-4eb9-8774-2a619e62d020'
+    events:
+      - http:
+          path: netrosa/apikey/{id}
+          method: delete
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:us-east-1:891335278704:userpool/${self:provider.nvAdminUserPool}
+
 
   getTenant:
     role: keyProvisioner
@@ -219,6 +382,13 @@ resources:
                       - dynamodb:PutItem
                       - dynamodb:DeleteItem
                     Resource: "arn:aws:dynamodb:us-east-1:891335278704:table/netvoteApiKeys"
+                  - Effect: Allow
+                    Action:
+                      - dynamodb:GetItem
+                      - dynamodb:Query
+                      - dynamodb:PutItem
+                      - dynamodb:DeleteItem
+                    Resource: "arn:aws:dynamodb:us-east-1:891335278704:table/netrosaApiKeys"
                   - Effect: Allow
                     Action:
                       - dynamodb:GetItem
