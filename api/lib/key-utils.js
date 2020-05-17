@@ -1,6 +1,6 @@
 const AWS = require("aws-sdk")
 let crypto = require("crypto")
-let uuid = require("uuid/v4")
+const { v4: uuidv4 } = require('uuid');
 
 const TABLE_API_KEYS = process.env.apiKeyTable;
 const CLIENT_ID = process.env.clientId;
@@ -107,15 +107,12 @@ const createKey = async (user) => {
     let tempPass = await generatePassword();
 
     let apiKey = await createApiKey(user.email);
-    let mainnet = user.mainnet ? 1 : 0;
-
-    let apiId = uuid();
+    let apiId = uuidv4();
 
     let attrs = [
         attr("name", user.id),
         attr("email", user.email),
-        attr("custom:company", user.company),
-        attr("custom:mainnet", `${mainnet}`),
+        attr("custom:tenantId", user.tenantId),
         attr("custom:apikey", apiKey.id)
     ]
 
@@ -135,11 +132,11 @@ const createKey = async (user) => {
 
     let apiSecret = await updatePassword(apiId, tempPass);
 
-    let keyId = uuid();
+    let keyId = uuidv4();
     let encryptedSecret = await kmsEncrypt(apiSecret);
     
     let dbObj = {
-        company: user.company,
+        tenantId: user.tenantId,
         keyId: keyId,
         apiKey: apiKey.value,
         apiId: apiId,
@@ -165,9 +162,9 @@ const createKey = async (user) => {
 const getKeyList = async (user) => {
     var params = {
         TableName : TABLE_API_KEYS,
-        KeyConditionExpression: "company = :company",
+        KeyConditionExpression: "tenantId = :tenantId",
         ExpressionAttributeValues: {
-            ":company":  user.company
+            ":tenantId":  user.tenantId
         }
     };
     let res = await docClient.query(params).promise();
@@ -190,7 +187,7 @@ const getKey = async (user, keyId) => {
     let params = {
         TableName: TABLE_API_KEYS,
         Key: {
-            "company": user.company,
+            "tenantId": user.tenantId,
             "keyId": keyId
         }
     }
@@ -229,7 +226,7 @@ const deleteKey = async (user, keyId) => {
     let params = {
         TableName: TABLE_API_KEYS,
         Key: {
-            "company": user.company,
+            "tenantId": user.tenantId,
             "keyId": keyId
         }
     }
@@ -254,5 +251,5 @@ module.exports = {
     deleteKey: deleteKey,
     kmsEncrypt: kmsEncrypt,
     insertKey: insertKey,
-    uuid: uuid
+    uuid: uuidv4
 }

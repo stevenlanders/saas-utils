@@ -2,19 +2,14 @@
 
 let AWS = require("aws-sdk")
 let crypto = require("crypto")
-let uuid = require("uuid/v4")
+const { v4: uuidv4 } = require('uuid');
 let tenants = require("./api/lib/tenants")
 var sp = new AWS.CognitoIdentityServiceProvider({apiVersion: '2016-04-18'});
 
 const CLIENT_ID = process.env.clientId;
 const USER_POOL_ID = process.env.userPoolId;
 const USAGE_PLAN_ID = process.env.usagePlanId;
-const USER_TYPE = process.env.userType;
 const REGION = process.env.region;
-
-const isNetvote = () => {
-  return USER_TYPE === "netvote";
-}
 
 const attr = (name, value) => {
   return {
@@ -47,7 +42,7 @@ const sendEmailToSupport = async (user) => {
   // Create sendEmail params
   const params = {
     Destination: {
-      ToAddresses: ["steven@netvote.io","support@citizendata.network"]
+      ToAddresses: ["steven.landers@gmail.com"]
     },
     Message: {
       Body: {
@@ -123,26 +118,27 @@ const updatePassword = async (username, tempPass) => {
   return newPassword;
 }
 
-module.exports.postCreateNetvoteAdminUser = async (event, context, callback) => {
+module.exports.postCreateAdminUser = async (event, context, callback) => {
   console.log(event);
-  if(!event.request.userAttributes["custom:company"]){
+  if(!event.request.userAttributes["custom:tenantId"]){
     let emailAddress = event.request.userAttributes["email"];
     let tenantId = await tenants.createNewTenant(emailAddress);
     await sp.adminUpdateUserAttributes({
       Username: event.userName,
-      UserAttributes: [{Name: "custom:company", Value: tenantId}],
+      UserAttributes: [{Name: "custom:tenantId", Value: tenantId}],
       UserPoolId: USER_POOL_ID
     }).promise()
 
     // copy attributes and append tenantId
     let attrs = JSON.parse(JSON.stringify(event.request.userAttributes));
-    attrs["custom:company"] = tenantId;
-    await sendEmailToSupport(attrs)
+    attrs["custom:tenantId"] = tenantId;
+    //TODO: configure email
+    //await sendEmailToSupport(attrs)
   }
   callback(null, event);
 }
 
-module.exports.createNetvoteAdminUser = async (event, context) => {
+module.exports.createAdminUser = async (event, context) => {
   if(!event.username) {
     return errorResp(400, "username is required");
   }
@@ -152,14 +148,14 @@ module.exports.createNetvoteAdminUser = async (event, context) => {
   if(!event.email){
     return errorResp(400, "email is required");
   }
-  if(!event.company){
-    return errorResp(400, "company is required");
+  if(!event.tenantId){
+    return errorResp(400, "tenantId is required");
   }
 
   let attrs = [
     attr("name", event.name),
     attr("email", event.email),
-    attr("custom:company", event.company)
+    attr("custom:tenantId", event.tenantId)
   ]
 
   await sp.adminCreateUser({
@@ -176,13 +172,11 @@ module.exports.createApiUser = async (event, context) => {
   if(!event.email){
     return errorResp(400, "email is required");
   }
-  if(!event.company){
-    return errorResp(400, "company is required");
+  if(!event.tenantId){
+    return errorResp(400, "tenantId is required");
   }
 
-  let mainnet = event.mainnet || 0;
-
-  let username = uuid();
+  let username = uuidv4();
   let tempPass = await generatePassword();
 
   let apiKey = await createApiKey(event.email);
@@ -190,8 +184,7 @@ module.exports.createApiUser = async (event, context) => {
   let attrs = [
     attr("name", event.name),
     attr("email", event.email),
-    attr("custom:company", event.company),
-    attr("custom:mainnet", `${mainnet}`),
+    attr("custom:tenantId", event.tenantId),
     attr("custom:apikey", apiKey.id)
   ]
 

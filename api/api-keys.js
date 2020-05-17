@@ -7,7 +7,7 @@ let tenants = require("./lib/tenants")
 module.exports.createKey = async (event, context) => {
     let user = utils.getUser(event);
     let keyCount = await keyUtils.countKeys(user);
-    let tenant = await tenants.getTenant(user.company);
+    let tenant = await tenants.getTenant(user.tenantId);
     console.log(user);
     if(keyCount >= tenant.maxApiKeys) {
         console.log(`attempt to create more than ${tenant.maxApiKeys} keys...not allowing`)

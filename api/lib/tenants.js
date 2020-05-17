@@ -1,5 +1,5 @@
 const AWS = require("aws-sdk")
-const uuid = require("uuid/v4")
+const { v4: uuidv4 } = require('uuid');
 const docClient = new AWS.DynamoDB.DocumentClient();
 
 const TABLE_TENANTS = "tenants";
@@ -16,7 +16,7 @@ const getTenant = async (tenantId) => {
 }
 
 const createNewTenant = async (ownerEmail) => {
-    let tenantId = uuid();
+    let tenantId = uuidv4();
     var params = {
         TableName: TABLE_TENANTS,
         Item:{

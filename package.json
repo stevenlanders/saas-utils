@@ -1,0 +1,23 @@
+{
+  "name": "saas-utils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/netvote/saas-utils.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/netvote/saas-utils/issues"
+  },
+  "homepage": "https://github.com/netvote/saas-utils#readme",
+  "dependencies": {
+    "uuid": "^8.0.0"
+  }
+}

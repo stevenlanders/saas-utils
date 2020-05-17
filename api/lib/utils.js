@@ -7,15 +7,10 @@ const getUser = (event) => {
         id = id.claims;
     }
 
-    let hasMainnet = ('1' === `${id["custom:mainnet"]}`);
     let u = {
         id: id.sub,
-        company: id["custom:company"],
-        email: id.email,
-        mainnet: hasMainnet,
-        phone: id.phone_number,
-        accountType: id["custom:accountType"],
-        maxApiKeys: id["custom:maxApiKeys"]
+        tenantId: id["custom:tenantId"],
+        email: id.email
     }
     console.log(u);
     return u;
